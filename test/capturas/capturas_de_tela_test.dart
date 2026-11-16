@@ -48,6 +48,15 @@ Future<void> carregarFontes() async {
   }
   await roboto.load();
 
+  // Textos sem família definida (como os dos botões) usam a fonte padrão
+  // dos testes ("FlutterTest", que desenha blocos). Registramos a Roboto
+  // também com esse nome, como acontece no celular Android de verdade.
+  final padrao = FontLoader('FlutterTest');
+  for (final nome in ['Roboto-Regular.ttf', 'Roboto-Medium.ttf', 'Roboto-Bold.ttf']) {
+    if (File('$pasta/$nome').existsSync()) padrao.addFont(ler(nome));
+  }
+  await padrao.load();
+
   if (File('$pasta/MaterialIcons-Regular.otf').existsSync()) {
     final icones = FontLoader('MaterialIcons')..addFont(ler('MaterialIcons-Regular.otf'));
     await icones.load();
