@@ -35,7 +35,7 @@ ThemeData temaLuzido() {
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         minimumSize: const Size(48, 56),
-        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        textStyle: const TextStyle(fontFamily: 'Roboto', fontSize: 18, fontWeight: FontWeight.bold),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
     ),
@@ -44,7 +44,7 @@ ThemeData temaLuzido() {
         minimumSize: const Size(48, 56),
         foregroundColor: CoresLuzido.lilas,
         side: const BorderSide(color: CoresLuzido.lilas, width: 2),
-        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        textStyle: const TextStyle(fontFamily: 'Roboto', fontSize: 18, fontWeight: FontWeight.bold),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
     ),
