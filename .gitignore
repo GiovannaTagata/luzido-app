@@ -1,0 +1,22 @@
+# Arquivos gerados pelo Flutter/Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Sistema
+.DS_Store
+
+# Chaves de assinatura do Android (nunca versionar)
+*.jks
+*.keystore
+key.properties
