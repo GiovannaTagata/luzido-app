@@ -34,7 +34,7 @@ jobs:
         run: flutter analyze --no-fatal-infos
 
       - name: Testes unitários, de widget e de integração (com cobertura)
-        run: flutter test --coverage --reporter expanded
+        run: flutter test --coverage --exclude-tags capturas --reporter expanded
 
       - name: Resumo da cobertura de código
         run: lcov --summary coverage/lcov.info
@@ -44,6 +44,52 @@ jobs:
         with:
           name: cobertura-lcov
           path: coverage/lcov.info
+
+  capturas:
+    name: Capturas de tela do app
+    needs: testes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Instalar o Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Instalar SQLite
+        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+
+      - name: Baixar dependências
+        run: flutter pub get
+
+      - name: Gerar as capturas de tela (telas reais com dados de exemplo)
+        run: flutter test --update-goldens --tags capturas test/capturas
+
+      - name: Guardar as capturas
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-de-tela
+          path: test/capturas/imagens/*.png
+
+      - name: Publicar as capturas na branch "capturas"
+        if: github.event_name == 'push'
+        run: |
+          mkdir -p /tmp/capturas
+          cp test/capturas/imagens/*.png /tmp/capturas/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan capturas
+          git rm -rq --cached .
+          rm -rf ./*
+          cp /tmp/capturas/*.png .
+          git add *.png
+          git commit -m "docs: atualiza capturas de tela do app"
+          git push -f origin capturas
 
   build:
     name: Build do APK (Android)

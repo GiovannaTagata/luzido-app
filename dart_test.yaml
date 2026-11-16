@@ -1,0 +1,3 @@
+tags:
+  # Testes que só geram as capturas de tela do app (rodam em um job separado do CI).
+  capturas:
