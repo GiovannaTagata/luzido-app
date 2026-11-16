@@ -110,6 +110,10 @@ void main() {
     servico.avancar();
     await tester.pump();
 
+    // Na tela de teste (800x600) o botão fica abaixo da dobra, então
+    // rolamos até ele antes de tocar.
+    await tester.ensureVisible(find.text('+1 min'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('+1 min'));
     await tester.pump();
     expect(find.text('03:00'), findsOneWidget);
