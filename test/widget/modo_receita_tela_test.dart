@@ -83,6 +83,38 @@ void main() {
     expect(find.text('Concluir receita'), findsOneWidget);
   });
 
+  testWidgets('concluir pede confirmação antes de mexer no estoque', (tester) async {
+    final servico = await abrirTela(tester);
+    servico.avancar();
+    servico.confirmarTemperatura();
+    servico.avancar();
+    await tester.pump();
+
+    await tester.tap(find.text('Concluir receita'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Concluir a receita?'), findsOneWidget);
+    expect(find.text('Concluir e atualizar estoque'), findsOneWidget);
+
+    // Se ela voltar, continua na receita.
+    await tester.tap(find.text('Voltar').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Concluir a receita?'), findsNothing);
+    expect(servico.receitaAtual, isNotNull);
+  });
+
+  testWidgets('botão +1 min aparece na etapa de timer', (tester) async {
+    final servico = await abrirTela(tester);
+    servico.avancar();
+    servico.confirmarTemperatura();
+    servico.avancar();
+    await tester.pump();
+
+    await tester.tap(find.text('+1 min'));
+    await tester.pump();
+    expect(find.text('03:00'), findsOneWidget);
+  });
+
   testWidgets('botões principais têm pelo menos 72 dp de altura (RNF04)', (tester) async {
     await abrirTela(tester);
     final tamanho = tester.getSize(
