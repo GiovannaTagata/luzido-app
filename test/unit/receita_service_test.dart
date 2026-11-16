@@ -112,6 +112,32 @@ void main() {
       expect(avisou, isTrue);
     });
 
+    test('+1 min soma 60 segundos no timer (ajuste da validação)', () {
+      servico.iniciar(receitaTeste);
+      servico.avancar();
+      servico.confirmarTemperatura();
+      servico.avancar();
+
+      servico.adicionarMinuto();
+      expect(servico.segundosRestantes, 63);
+
+      // Também funciona depois que o timer terminou.
+      servico.iniciarTimer();
+      for (var i = 0; i < 63; i++) {
+        servico.tick();
+      }
+      expect(servico.timerFinalizado, isTrue);
+      servico.adicionarMinuto();
+      expect(servico.segundosRestantes, 60);
+      expect(servico.timerFinalizado, isFalse);
+    });
+
+    test('+1 min não faz nada em etapa sem timer', () {
+      servico.iniciar(receitaTeste);
+      servico.adicionarMinuto();
+      expect(servico.segundosRestantes, 0);
+    });
+
     test('pausar o timer para a contagem', () {
       servico.iniciar(receitaTeste);
       servico.avancar();
