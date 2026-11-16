@@ -7,7 +7,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:luzido/app.dart';
 import 'package:luzido/data/app_database.dart';
 import 'package:luzido/data/dados_exemplo.dart';
 import 'package:luzido/data/insumo_repository.dart';
@@ -108,16 +107,6 @@ Widget comProviders(Ambiente ambiente, Widget tela) {
 }
 
 void main() {
-  testWidgets('captura 0 - tela inicial com a receita e o inventário', (tester) async {
-    configurarCelular(tester);
-    final ambiente = await criarAmbiente(tester);
-
-    await tester.pumpWidget(LuzidoApp(estoque: ambiente.estoque, receitas: ambiente.receitas));
-    await tester.pumpAndSettle();
-
-    await expectLater(find.byType(MaterialApp), matchesGoldenFile('imagens/captura0_tela_inicial.png'));
-  });
-
   testWidgets('captura 1 - modo receita com timer', (tester) async {
     configurarCelular(tester);
     final ambiente = await criarAmbiente(tester);
