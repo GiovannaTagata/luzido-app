@@ -100,7 +100,48 @@ class _ModoReceitaTelaState extends State<ModoReceitaTela> {
     }
   }
 
+  /// Ajuste da 1ª rodada de validação: na primeira vez a Rita tocou em
+  /// "Concluir receita" sem querer. Agora o app pede confirmação e mostra
+  /// o que vai ser descontado do estoque.
+  Future<bool> _confirmarConclusao() async {
+    final itens = _servico.receitaAtual?.itens ?? const [];
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (contexto) => AlertDialog(
+        title: const Text('Concluir a receita?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'O estoque será atualizado:',
+              style: TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 8),
+            for (final item in itens)
+              Text(
+                '• ${item.nomeInsumo}: − ${formatarQuantidade(item.quantidadeUsada, item.unidade)}',
+                style: const TextStyle(fontSize: 18),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(contexto, false),
+            child: const Text('Voltar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(contexto, true),
+            child: const Text('Concluir e atualizar estoque'),
+          ),
+        ],
+      ),
+    );
+    return confirmar == true;
+  }
+
   Future<void> _concluir() async {
+    if (!await _confirmarConclusao() || !mounted) return;
     final estoque = context.read<EstoqueService>();
     final navegador = Navigator.of(context);
     try {
@@ -330,11 +371,26 @@ class _BlocoTimer extends StatelessWidget {
           style: const TextStyle(fontSize: 56, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        FilledButton.icon(
-          style: FilledButton.styleFrom(minimumSize: const Size(72, 76)),
-          onPressed: servico.timerRodando ? servico.pausarTimer : servico.iniciarTimer,
-          icon: Icon(servico.timerRodando ? Icons.pause : Icons.play_arrow, size: 32),
-          label: Text(servico.timerRodando ? 'Pausar timer' : 'Iniciar timer'),
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(minimumSize: const Size(72, 76)),
+                onPressed: servico.timerRodando ? servico.pausarTimer : servico.iniciarTimer,
+                icon: Icon(servico.timerRodando ? Icons.pause : Icons.play_arrow, size: 32),
+                label: Text(servico.timerRodando ? 'Pausar timer' : 'Iniciar timer'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(minimumSize: const Size(72, 76)),
+                onPressed: servico.adicionarMinuto,
+                child: const Text('+1 min'),
+              ),
+            ),
+          ],
         ),
         if (servico.timerFinalizado)
           const Padding(

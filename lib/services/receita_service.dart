@@ -174,6 +174,16 @@ class ReceitaService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Ajuste da 1ª rodada de validação: a Rita pediu um botão "+1 min"
+  /// porque às vezes a cera precisa de um pouco mais de tempo.
+  void adicionarMinuto() {
+    final etapa = etapaAtual;
+    if (etapa == null || etapa.tipo != TipoEtapa.tempo) return;
+    _segundosRestantes += 60;
+    _timerFinalizado = false;
+    notifyListeners();
+  }
+
   /// Avança o timer em um segundo. É chamado pelo Timer.periodic e pode ser
   /// chamado direto nos testes.
   @visibleForTesting
