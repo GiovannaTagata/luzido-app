@@ -88,6 +88,25 @@ class EstoqueService extends ChangeNotifier implements ObservadorReceita {
     await carregar();
   }
 
+  /// Ajuste da 2ª rodada de validação: a Rita pediu um jeito rápido de
+  /// somar o que ela comprou, sem precisar editar o insumo e fazer a conta.
+  Future<void> registrarCompra(int id, double quantidade) async {
+    if (quantidade <= 0) {
+      throw const ValidacaoException(
+        'Informe a quantidade comprada. Use só números maiores que zero.',
+      );
+    }
+    if (quantidade > 1000000) {
+      throw const ValidacaoException('Quantidade muito alta. Confira o número.');
+    }
+    final insumo = await _repositorio.buscarPorId(id);
+    if (insumo == null) {
+      throw const ValidacaoException('Insumo não encontrado.');
+    }
+    await _repositorio.salvarQuantidades({id: insumo.quantidadeAtual + quantidade});
+    await carregar();
+  }
+
   Future<void> excluir(int id) async {
     if (await _repositorio.estaEmUso(id)) {
       throw const ValidacaoException(
