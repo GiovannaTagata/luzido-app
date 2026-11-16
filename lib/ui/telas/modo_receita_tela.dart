@@ -51,10 +51,16 @@ class _ModoReceitaTelaState extends State<ModoReceitaTela> {
     }
   }
 
-  void _avisarFimDoTimer() {
-    SystemSound.play(SystemSoundType.alert);
-    HapticFeedback.vibrate();
+  /// Ajuste da 2ª validação: com o barulho da cozinha a Rita não ouviu um
+  /// único bipe. Agora o aviso toca e vibra 3 vezes.
+  Future<void> _avisarFimDoTimer() async {
     _mostrarMensagem('Tempo esgotado!');
+    for (var i = 0; i < 3; i++) {
+      if (!mounted) return;
+      SystemSound.play(SystemSoundType.alert);
+      HapticFeedback.heavyImpact();
+      await Future<void>.delayed(const Duration(milliseconds: 700));
+    }
   }
 
   void _mostrarMensagem(String texto) {

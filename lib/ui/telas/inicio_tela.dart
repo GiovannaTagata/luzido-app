@@ -127,6 +127,44 @@ class _InicioTelaState extends State<InicioTela> {
     }
   }
 
+  /// Ajuste da 2ª validação: botão para somar o que foi comprado.
+  Future<void> _registrarCompra(Insumo insumo) async {
+    final estoque = context.read<EstoqueService>();
+    final controle = TextEditingController();
+    final quantidade = await showDialog<double>(
+      context: context,
+      builder: (contexto) => AlertDialog(
+        title: Text('Registrar compra: ${insumo.nome}'),
+        content: TextField(
+          controller: controle,
+          autofocus: true,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+            labelText: 'Quantidade comprada (${insumo.unidade})',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(contexto),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(contexto, lerNumero(controle.text) ?? 0),
+            child: const Text('Somar ao estoque'),
+          ),
+        ],
+      ),
+    );
+    controle.dispose();
+    if (quantidade == null || insumo.id == null) return;
+    try {
+      await estoque.registrarCompra(insumo.id!, quantidade);
+      if (mounted) _mensagem('Compra registrada: + ${formatarQuantidade(quantidade, insumo.unidade)}');
+    } on ValidacaoException catch (e) {
+      if (mounted) _mensagem(e.mensagem);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final estoque = context.watch<EstoqueService>();
@@ -197,7 +235,10 @@ class _InicioTelaState extends State<InicioTela> {
           Expanded(
             child: _aba == 0
                 ? _ListaReceitas(aoComecar: _comecar)
-                : _ListaInventario(aoEditar: _editarInsumo),
+                : _ListaInventario(
+                    aoEditar: _editarInsumo,
+                    aoRegistrarCompra: _registrarCompra,
+                  ),
           ),
         ],
       ),
@@ -311,9 +352,10 @@ class _ListaReceitas extends StatelessWidget {
 }
 
 class _ListaInventario extends StatelessWidget {
-  const _ListaInventario({required this.aoEditar});
+  const _ListaInventario({required this.aoEditar, required this.aoRegistrarCompra});
 
   final Future<void> Function(Insumo insumo) aoEditar;
+  final Future<void> Function(Insumo insumo) aoRegistrarCompra;
 
   @override
   Widget build(BuildContext context) {
@@ -360,9 +402,22 @@ class _ListaInventario extends StatelessWidget {
                     ],
                   )
                 : Text(nomesCategorias[insumo.categoria] ?? insumo.categoria),
-            trailing: Text(
-              formatarQuantidade(insumo.quantidadeAtual, insumo.unidade),
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  formatarQuantidade(insumo.quantidadeAtual, insumo.unidade),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  iconSize: 32,
+                  constraints: const BoxConstraints(minWidth: 56, minHeight: 56),
+                  tooltip: 'Registrar compra',
+                  onPressed: () => aoRegistrarCompra(insumo),
+                  icon: const Icon(Icons.add_shopping_cart, color: CoresLuzido.lilas),
+                ),
+              ],
             ),
           ),
         );
