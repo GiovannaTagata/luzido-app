@@ -95,6 +95,8 @@ jobs:
     name: Build do APK (Android)
     needs: testes
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Baixar o código
         uses: actions/checkout@v4
@@ -125,3 +127,15 @@ jobs:
         with:
           name: luzido-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
+
+      - name: Publicar o APK na Release pública v1.0.0 (só na main)
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp build/app/outputs/flutter-apk/app-debug.apk luzido.apk
+          if gh release view v1.0.0 > /dev/null 2>&1; then
+            gh release upload v1.0.0 luzido.apk --clobber
+          else
+            gh release create v1.0.0 luzido.apk --target main --title "Luzido v1.0.0 (MVP)" --notes "APK do app Luzido para Android. Baixe o arquivo luzido.apk no celular e instale (permitir instalar apps de fontes desconhecidas). Funciona offline."
+          fi

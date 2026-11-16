@@ -1,0 +1,30 @@
+name: Monitoramento
+
+# Verifica a cada hora se a página do app e o download do APK estão no ar.
+# Se algo cair, o job fica vermelho (DOWN) e o GitHub envia e-mail de falha.
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+jobs:
+  verificar:
+    name: Verificar disponibilidade
+    runs-on: ubuntu-latest
+    steps:
+      - name: Página da Release está no ar
+        run: |
+          codigo=$(curl -s -o /dev/null -w "%{http_code}" https://github.com/${{ github.repository }}/releases/tag/v1.0.0)
+          echo "Página da release: HTTP $codigo"
+          test "$codigo" = "200"
+
+      - name: Download do APK está no ar
+        run: |
+          codigo=$(curl -sL -o luzido.apk -w "%{http_code}" https://github.com/${{ github.repository }}/releases/download/v1.0.0/luzido.apk)
+          tamanho=$(stat -c %s luzido.apk)
+          echo "Download do APK: HTTP $codigo, $tamanho bytes"
+          test "$codigo" = "200"
+          test "$tamanho" -gt 1000000
+
+      - name: Status
+        run: echo "STATUS UP - app disponível em $(date -u '+%d/%m/%Y %H:%M UTC')"
