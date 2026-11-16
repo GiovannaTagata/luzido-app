@@ -6,6 +6,7 @@ import 'data/dados_exemplo.dart';
 import 'data/insumo_repository.dart';
 import 'data/receita_repository.dart';
 import 'services/estoque_service.dart';
+import 'services/pin_service.dart';
 import 'services/receita_service.dart';
 
 Future<void> main() async {
@@ -22,9 +23,10 @@ Future<void> main() async {
   final receitas = ReceitaService(receitaRepository)
     // Observer: quando a receita termina, o estoque faz a baixa automática.
     ..adicionarObservador(estoque);
+  final pin = PinService(db);
 
   await estoque.carregar();
   await receitas.carregar();
 
-  runApp(LuzidoApp(estoque: estoque, receitas: receitas));
+  runApp(LuzidoApp(estoque: estoque, receitas: receitas, pin: pin));
 }
