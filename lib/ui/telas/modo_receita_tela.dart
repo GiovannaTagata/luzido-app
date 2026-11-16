@@ -270,7 +270,7 @@ class _ModoReceitaTelaState extends State<ModoReceitaTela> {
                           child: OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(72, 76),
-                              textStyle: const TextStyle(
+                              textStyle: const TextStyle(fontFamily: 'Roboto', 
                                 fontSize: 21,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -286,7 +286,7 @@ class _ModoReceitaTelaState extends State<ModoReceitaTela> {
                           child: FilledButton.icon(
                             style: FilledButton.styleFrom(
                               minimumSize: const Size(72, 76),
-                              textStyle: const TextStyle(
+                              textStyle: const TextStyle(fontFamily: 'Roboto', 
                                 fontSize: 21,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -455,7 +455,7 @@ class _BlocoTemperatura extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: CoresLuzido.verde,
               minimumSize: const Size(72, 76),
-              textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              textStyle: const TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.bold),
             ),
             onPressed: confirmada ? null : servico.confirmarTemperatura,
             icon: Icon(confirmada ? Icons.check_circle : Icons.thermostat, size: 30),
