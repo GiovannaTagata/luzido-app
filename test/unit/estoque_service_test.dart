@@ -196,6 +196,18 @@ void main() {
       expect(repositorio.dados.containsKey(idCera), isTrue);
     });
 
+    test('registrar compra soma no estoque (ajuste da 2ª validação)', () async {
+      await servico.registrarCompra(idPavio, 20);
+      expect(repositorio.dados[idPavio]!.quantidadeAtual, 29);
+      expect(servico.insumos.firstWhere((i) => i.id == idPavio).quantidadeAtual, 29);
+    });
+
+    test('registrar compra não aceita zero nem número negativo', () async {
+      await expectLater(servico.registrarCompra(idPavio, 0), throwsA(isA<ValidacaoException>()));
+      await expectLater(servico.registrarCompra(idPavio, -3), throwsA(isA<ValidacaoException>()));
+      expect(repositorio.dados[idPavio]!.quantidadeAtual, 9);
+    });
+
     test('lista insumos com estoque baixo', () async {
       await servico.darBaixa(receitaLavanda());
       expect(
